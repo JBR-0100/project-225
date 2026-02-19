@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { Logger } from '../../infrastructure/Logger';
 import { ContractStatus } from '../types/enums';
 import { Customer } from './Customer';
 import { Vehicle } from './Vehicle';
@@ -72,7 +73,7 @@ export class RentalContract {
         this.CalculateEstimatedTotal();
         this.status = ContractStatus.CONFIRMED;
         this.vehicle.reserve(); // Transition vehicle state
-        console.log(`Contract ${this.contractId} confirmed. Estimated Total: $${this.totalAmount}`);
+        Logger.info(`Contract ${this.contractId} confirmed. Estimated Total: $${this.totalAmount}`, { contractId: this.contractId, totalAmount: this.totalAmount });
     }
 
     activate(): void {
@@ -81,7 +82,7 @@ export class RentalContract {
         }
         this.status = ContractStatus.ACTIVE;
         this.vehicle.activateRental(); // Transition vehicle state
-        console.log(`Contract ${this.contractId} activated.`);
+        Logger.info(`Contract ${this.contractId} activated.`, { contractId: this.contractId });
     }
 
     complete(returnDate: Date, mileageAdded: number): void {
@@ -99,7 +100,7 @@ export class RentalContract {
         const pointsEarned = Math.floor(this.totalAmount / 10);
         this.customer.addLoyaltyPoints(pointsEarned);
 
-        console.log(`Contract completed. Final Total: $${this.totalAmount}. Points earned: ${pointsEarned}`);
+        Logger.info(`Contract completed. Final Total: $${this.totalAmount}. Points earned: ${pointsEarned}`, { contractId: this.contractId, totalAmount: this.totalAmount, pointsEarned });
     }
 
     private CalculateEstimatedTotal(): void {

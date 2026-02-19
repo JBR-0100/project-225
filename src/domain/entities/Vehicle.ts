@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { Logger } from '../../infrastructure/Logger';
 import { VehicleState } from '../patterns/state/VehicleState.interface';
 import { AvailableState } from '../patterns/state/AvailableState';
 import { VehicleType } from '../types/enums';
@@ -46,7 +47,11 @@ export abstract class Vehicle {
 
     // State Transitions (delegated to State object)
     setState(newState: VehicleState): void {
-        console.log(`Transitioning state: ${this.state.getStateName()} -> ${newState.getStateName()}`);
+        Logger.info(`Transitioning state: ${this.state.getStateName()} -> ${newState.getStateName()}`, {
+            vehicleId: this.vehicleId,
+            oldState: this.state.getStateName(),
+            newState: newState.getStateName()
+        });
         this.state = newState;
     }
 
@@ -74,7 +79,7 @@ export abstract class Vehicle {
     updateMileage(km: number): void {
         if (km < 0) throw new Error('Mileage cannot be negative.');
         this.mileageKm += km;
-        console.log(`Mileage updated. New total: ${this.mileageKm} km`);
+        Logger.info(`Mileage updated for vehicle ${this.vehicleId}. New total: ${this.mileageKm} km`);
     }
 
     // Abstract methods to be implemented by subclasses

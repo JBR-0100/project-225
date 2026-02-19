@@ -1,8 +1,36 @@
 import app from './app';
+import { PrismaClient } from '@prisma/client';
+import { Logger } from './infrastructure/Logger';
 
 const PORT = process.env.PORT || 3000;
+const prisma = new PrismaClient();
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+const server = app.listen(PORT, () => {
+    Logger.info(`Server is running on port ${PORT}`);
 });
+
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
+
+async function gracefulShutdown() {
+    Logger.info('Received shutdown signal. Closing HTTP server...');
+
+    server.close(async () => {
+        Logger.info('HTTP server closed.');
+
+        try {
+            await prisma.$disconnect();
+            Logger.info('Database connection closed.');
+            process.exit(0);
+        } catch (err) {
+            Logger.error('Error during database disconnection', { error: err });
+            process.exit(1);
+        }
+    });
+
+    // Force close if it takes too long
+    setTimeout(() => {
+        Logger.error('Could not close connections in time, forcefully shutting down');
+        process.exit(1);
+    }, 10000);
+}
