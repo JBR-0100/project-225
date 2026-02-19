@@ -44,6 +44,12 @@ export class RentalContract {
         this.totalAmount = 0;
     }
 
+    // Getters for Persistence
+    getStartDate(): Date { return this.startDate; }
+    getEndDate(): Date { return this.endDate; }
+    getBasePrice(): number { return this.basePrice; }
+    getInsuranceTotal(): number { return this.insuranceTotal; }
+
     // Getters
     getContractId(): string { return this.contractId; }
     getStatus(): ContractStatus { return this.status; }

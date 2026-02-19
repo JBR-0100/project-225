@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Enums (Mirroring Domain Enums)
+model VehicleTypeEnum {
+  name String @id
+}
+
+model VehicleStateEnum {
+  name String @id
+}
+
+model LoyaltyTierEnum {
+  name String @id
+}
+
+model ContractStatusEnum {
+  name String @id
+}
+
+model InsuranceTierEnum {
+  name String @id
+}
+
+model MaintenanceStatusEnum {
+  name String @id
+}
+
+// --- Entities ---
+
+model Customer {
+  customerId      String   @id @default(uuid())
+  firstName       String
+  lastName        String
+  email           String   @unique
+  phone           String
+  loyaltyTier     String   @default("BRONZE") // Maps to LoyaltyTierEnum
+  loyaltyPoints   Int      @default(0)
+  isBlacklisted   Boolean  @default(false)
+  
+  contracts       RentalContract[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Vehicle {
+  vehicleId       String   @id @default(uuid())
+  make            String
+  model           String
+  year            Int
+  licensePlate    String   @unique
+  dailyRate       Float
+  location        String   @default("HQ")
+  mileageKm       Int      @default(0)
+  
+  state           String   // Maps to VehicleStateEnum
+  type            String   // Maps to VehicleTypeEnum: CAR, TRUCK, ELECTRIC_VEHICLE
+
+  // Subclass specific fields (Nullable for Single Table Inheritance)
+  // Car
+  numDoors        Int?
+  transmission    String?
+  fuelType        String?
+  seatingCapacity Int?
+  
+  // Truck
+  payloadCapacityTons Float?
+  truckClass          String?
+  hasRefrigeration    Boolean?
+  
+  // ElectricVehicle
+  batteryCapacityKwh  Int?
+  rangeKm             Int?
+  batteryHealthPct    Int?
+  chargerType         String?
+
+  contracts       RentalContract[]
+  
+  // Soft Delete
+  deletedAt       DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model RentalContract {
+  contractId      String   @id @default(uuid())
+  
+  customerId      String
+  customer        Customer @relation(fields: [customerId], references: [customerId])
+  
+  vehicleId       String
+  vehicle         Vehicle  @relation(fields: [vehicleId], references: [vehicleId])
+  
+  status          String   // Maps to ContractStatusEnum
+  
+  startDate       DateTime
+  endDate         DateTime
+  actualReturnDate DateTime?
+  
+  // Financials
+  basePrice       Float    @default(0)
+  insuranceTotal  Float    @default(0)
+  totalAmount     Float    @default(0)
+  
+  // Relations
+  insurancePolicy InsurancePolicy?
+
+  // Concurrency Control (Optimistic Locking)
+  version         Int      @default(1)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model InsurancePolicy {
+  policyId        String   @id @default(uuid())
+  
+  contractId      String   @unique
+  contract        RentalContract @relation(fields: [contractId], references: [contractId])
+  
+  tier            String   // Maps to InsuranceTierEnum
+  dailyPremium    Float
+  deductibleAmount Float
+  maxCoverageAmount Float
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
