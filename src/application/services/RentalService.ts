@@ -8,6 +8,7 @@ import { InsuranceTier } from '../../domain/types/enums';
 
 import { Logger } from '../../infrastructure/Logger';
 import { AppError, VehicleNotAvailableError } from '../../domain/errors';
+import { EventBus, DomainEvents } from '../../infrastructure/events/EventBus';
 
 export class RentalService {
     private contractRepo: ContractRepository;
@@ -82,6 +83,14 @@ export class RentalService {
         await this.vehicleRepo.save(vehicle);
 
         Logger.info('Rental contract created successfully', { contractId: contract.getContractId(), vehicleId });
+
+        // Observer Pattern: Publish event to trigger background jobs
+        EventBus.publish(DomainEvents.RENTAL_CREATED, {
+            contractId: contract.getContractId(),
+            customerEmail: customerId,
+            totalAmount: contract.getTotalAmount(),
+            insuranceTier,
+        });
 
         return contract;
     }

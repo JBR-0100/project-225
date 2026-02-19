@@ -63,6 +63,7 @@ model Vehicle {
   dailyRate       Float
   location        String   @default("HQ")
   mileageKm       Int      @default(0)
+  lastServiceMileage Int    @default(0)
   
   state           String   // Maps to VehicleStateEnum
   type            String   // Maps to VehicleTypeEnum: CAR, TRUCK, ELECTRIC_VEHICLE

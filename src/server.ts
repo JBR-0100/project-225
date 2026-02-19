@@ -1,6 +1,9 @@
 import app from './app';
 import { PrismaClient } from '@prisma/client';
 import { Logger } from './infrastructure/Logger';
+import { bootstrapBackgroundServices } from './infrastructure/bootstrap';
+
+bootstrapBackgroundServices();
 
 const PORT = process.env.PORT || 3000;
 const prisma = new PrismaClient();

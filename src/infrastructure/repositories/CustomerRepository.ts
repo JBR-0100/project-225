@@ -1,7 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { Customer } from '../../domain/entities/Customer';
 import { PrismaService } from '../PrismaService';
-
+import { EventBus, DomainEvents } from '../events/EventBus';
+import { Logger } from '../Logger';
 export class CustomerRepository {
     private prisma: PrismaClient;
 
@@ -31,6 +32,13 @@ export class CustomerRepository {
                 passwordHash: customer.getPasswordHash(),
                 role: customer.getRole()
             }
+        });
+
+        // Observer Pattern: Publish domain event (triggers welcome email job)
+        EventBus.publish(DomainEvents.CUSTOMER_CREATED, {
+            customerId: customer.getCustomerId(),
+            email: customer.getEmail(),
+            firstName: customer.getName().split(' ')[0],
         });
     }
 
