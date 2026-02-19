@@ -18,7 +18,9 @@ export class CustomerRepository {
                 email: customer.getEmail(),
                 phone: '555-0000', // Placeholder as domain entity might not expose everything yet
                 loyaltyTier: customer.getLoyaltyTier(),
-                loyaltyPoints: customer.getLoyaltyPoints(),
+                isBlacklisted: customer.isBlocked(),
+                passwordHash: customer.getPasswordHash(),
+                role: customer.getRole()
             },
             create: {
                 customerId: customer.getCustomerId(),
@@ -26,24 +28,31 @@ export class CustomerRepository {
                 lastName: customer.getName().split(' ')[1] || '',
                 email: customer.getEmail(),
                 phone: '555-0000',
-                loyaltyTier: customer.getLoyaltyTier(),
-                loyaltyPoints: customer.getLoyaltyPoints(),
-            },
+                passwordHash: customer.getPasswordHash(),
+                role: customer.getRole()
+            }
         });
     }
 
     async findByEmail(email: string): Promise<Customer | null> {
-        const data = await this.prisma.customer.findUnique({ where: { email } });
-        if (!data) return null;
+        const customerData = await this.prisma.customer.findUnique({
+            where: { email }
+        });
 
-        // Hydrate domain entity (simplified)
-        // Note: In a real app, we would use a Factory or static method to reconstitute
-        // without generating a new ID/events. For now, we hack it by creating new and restoring ID.
-        const customer = new Customer(data.firstName, data.lastName, data.email, data.phone);
-        (customer as any).customerId = data.customerId;
-        (customer as any).loyaltyTier = data.loyaltyTier as any;
-        (customer as any).loyaltyPoints = data.loyaltyPoints;
+        if (!customerData) return null;
 
-        return customer;
+        // Restore using static method
+        return Customer.restore(
+            customerData.customerId,
+            customerData.firstName,
+            customerData.lastName,
+            customerData.email,
+            customerData.phone,
+            customerData.loyaltyTier as any,
+            customerData.loyaltyPoints,
+            customerData.isBlacklisted,
+            customerData.passwordHash,
+            customerData.role
+        );
     }
 }

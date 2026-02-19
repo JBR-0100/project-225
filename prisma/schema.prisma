@@ -44,6 +44,10 @@ model Customer {
   loyaltyPoints   Int      @default(0)
   isBlacklisted   Boolean  @default(false)
   
+  // Auth Fields
+  passwordHash    String   @default("")
+  role            String   @default("CUSTOMER") // "CUSTOMER" or "FLEET_MANAGER"
+  
   contracts       RentalContract[]
   
   createdAt       DateTime @default(now())
