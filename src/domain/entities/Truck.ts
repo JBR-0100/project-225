@@ -14,9 +14,10 @@ export class Truck extends Vehicle {
         dailyRate: number,
         payloadCapacityTons: number,
         truckClass: string,
-        hasRefrigeration: boolean
+        hasRefrigeration: boolean,
+        initialMileage: number = 0
     ) {
-        super(make, model, year, licensePlate, dailyRate);
+        super(make, model, year, licensePlate, dailyRate, 'HQ', initialMileage);
         this.payloadCapacityTons = payloadCapacityTons;
         this.truckClass = truckClass;
         this.hasRefrigeration = hasRefrigeration;

@@ -43,6 +43,13 @@ export class VehicleRepository {
         });
     }
 
+    async findAll(): Promise<Vehicle[]> {
+        const vehicles = await this.prisma.vehicle.findMany({
+            where: { deletedAt: null },
+        });
+        return vehicles.map(v => VehicleMapper.toDomain(v));
+    }
+
     async findAvailableByDate(startDate: Date, endDate: Date): Promise<Vehicle[]> {
         // 1. Find vehicles that are NOT soft deleted
         // 2. Find vehicles that do NOT have conflicting ACTIVE/CONFIRMED contracts

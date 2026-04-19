@@ -13,6 +13,7 @@ export class VehicleFactory {
         const year = Number(data.year);
         const licensePlate = String(data.licensePlate);
         const dailyRate = Number(data.dailyRate);
+        const initialMileage = Number(data.mileageKm || 0);
 
         switch (type) {
             case VehicleType.CAR: {
@@ -24,7 +25,8 @@ export class VehicleFactory {
                 // @ts-ignore
                 return new Car(
                     make, model, year, licensePlate, dailyRate,
-                    numDoors, transmission, fuelType, seatingCapacity
+                    numDoors, transmission, fuelType, seatingCapacity,
+                    initialMileage
                 );
             }
             case VehicleType.TRUCK: {
@@ -34,7 +36,8 @@ export class VehicleFactory {
 
                 return new Truck(
                     make, model, year, licensePlate, dailyRate,
-                    payload, truckClass, refrigeration
+                    payload, truckClass, refrigeration,
+                    initialMileage
                 );
             }
             case VehicleType.ELECTRIC_VEHICLE: {
@@ -44,7 +47,8 @@ export class VehicleFactory {
 
                 return new ElectricVehicle(
                     make, model, year, licensePlate, dailyRate,
-                    capacity, range, charger
+                    capacity, range, charger,
+                    initialMileage
                 );
             }
             default:

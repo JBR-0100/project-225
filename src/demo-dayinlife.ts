@@ -56,19 +56,22 @@ log('Creating 3 vehicles using the Factory Pattern...\n');
 
 const sedan = VehicleFactory.createVehicle(VehicleType.CAR, {
     make: 'Toyota', model: 'Camry', year: 2024,
-    licensePlate: 'DF-CAR-001', dailyRate: 55,
+    licensePlate: 'DF-CAR-001', dailyRate: 4500,
+    mileageKm: 12500,
     numDoors: 4, transmission: 'Automatic', fuelType: 'Hybrid', seatingCapacity: 5,
 });
 
 const tesla = VehicleFactory.createVehicle(VehicleType.ELECTRIC_VEHICLE, {
     make: 'Tesla', model: 'Model 3', year: 2025,
-    licensePlate: 'DF-EV-001', dailyRate: 120,
+    licensePlate: 'DF-EV-001', dailyRate: 9500,
+    mileageKm: 2800,
     batteryCapacityKwh: 75, rangeKm: 358, chargerType: 'Type 2',
 });
 
 const truck = VehicleFactory.createVehicle(VehicleType.TRUCK, {
     make: 'Ford', model: 'F-150', year: 2023,
-    licensePlate: 'DF-TRK-001', dailyRate: 85,
+    licensePlate: 'DF-TRK-001', dailyRate: 6800,
+    mileageKm: 35400,
     payloadCapacityTons: 1.5, truckClass: 'Light Duty', hasRefrigeration: false,
 });
 
@@ -79,7 +82,7 @@ console.log('  ├────────────────────�
 for (const v of fleet) {
     const name = `${v.getMake()} ${v.getModel()}`.padEnd(18);
     const type = v.getVehicleType().padEnd(16);
-    const rate = `$${v.getDailyRate()}`.padEnd(10);
+    const rate = `₹${v.getDailyRate()}`.padEnd(10);
     const state = v.getState().getStateName().padEnd(11);
     console.log(`  │ ${name} │ ${type} │ ${rate} │ ${state} │`);
 }
@@ -147,15 +150,15 @@ const standardContract = new RentalContract(
 standardContract.confirm();
 const standardPrice = standardContract.getTotalAmount();
 log(`Customer: ${standardCustomer.getName()} (Tier: ${standardCustomer.getLoyaltyTier()})`);
-log(`Vehicle:  ${sedan.getMake()} ${sedan.getModel()} @ $${sedan.getDailyRate()}/day`);
-log(`Duration: ${days} days`);
-log(`Strategy: ${standardStrategy.getStrategyName()}`);
-log(`Total:    $${standardPrice}`);
+    console.log(`  ▸ Vehicle:  ${sedan.getMake()} ${sedan.getModel()} @ ₹${sedan.getDailyRate()}/day`);
+    log(`Duration: ${days} days`);
+    log(`Strategy: ${standardStrategy.getStrategyName()}`);
+    log(`Total:    ₹${standardPrice}`);
 
-// Return sedan so gold customer can use it
-standardContract.activate();
-standardContract.complete(new Date(), 500);
-
+    // Return sedan so gold customer can use it
+    standardContract.activate();
+    standardContract.complete(new Date(), 500);
+    
 subheader('Gold Customer — Loyalty Pricing (10% Discount)');
 const loyaltyStrategy = new LoyaltyPricingStrategy();
 const goldContract = new RentalContract(
@@ -164,10 +167,10 @@ const goldContract = new RentalContract(
 goldContract.confirm();
 const goldPrice = goldContract.getTotalAmount();
 log(`Customer: ${goldCustomer.getName()} (Tier: ${goldCustomer.getLoyaltyTier()})`);
-log(`Vehicle:  ${sedan.getMake()} ${sedan.getModel()} @ $${sedan.getDailyRate()}/day`);
+log(`Vehicle:  ${sedan.getMake()} ${sedan.getModel()} @ ₹${sedan.getDailyRate()}/day`);
 log(`Duration: ${days} days`);
 log(`Strategy: ${loyaltyStrategy.getStrategyName()}`);
-log(`Total:    $${goldPrice}`);
+log(`Total:    ₹${goldPrice}`);
 
 subheader('Price Comparison Summary');
 const savings = standardPrice - goldPrice;
@@ -175,11 +178,11 @@ const pct = ((savings / standardPrice) * 100).toFixed(1);
 console.log('  ┌────────────────────┬────────────┬────────────┐');
 console.log('  │ Metric             │ Standard   │ Gold       │');
 console.log('  ├────────────────────┼────────────┼────────────┤');
-console.log(`  │ Base Vehicle Cost  │ $${(sedan.getDailyRate() * days).toFixed(0).padEnd(9)} │ $${(sedan.getDailyRate() * days * 0.9).toFixed(0).padEnd(9)} │`);
-console.log(`  │ Insurance          │ $${(15 * days).toFixed(0).padEnd(9)} │ $${(15 * days).toFixed(0).padEnd(9)} │`);
-console.log(`  │ TOTAL              │ $${standardPrice.toFixed(0).padEnd(9)} │ $${goldPrice.toFixed(0).padEnd(9)} │`);
+console.log(`  │ Base Vehicle Cost  │ ₹${(sedan.getDailyRate() * days).toFixed(0).padEnd(9)} │ ₹${(sedan.getDailyRate() * days * 0.9).toFixed(0).padEnd(9)} │`);
+console.log(`  │ Insurance          │ ₹${(insuranceBasic.getDailyPremium() * days).toFixed(0).padEnd(9)} │ ₹${(insuranceBasic.getDailyPremium() * days).toFixed(0).padEnd(9)} │`);
+console.log(`  │ TOTAL              │ ₹${standardPrice.toFixed(0).padEnd(9)} │ ₹${goldPrice.toFixed(0).padEnd(9)} │`);
 console.log('  └────────────────────┴────────────┴────────────┘');
-success(`Gold customer saves $${savings.toFixed(0)} (${pct}%) — Strategy Pattern proved!`);
+success(`Gold customer saves ₹${savings.toFixed(0)} (${pct}%) — Strategy Pattern proved!`);
 
 // Return sedan
 goldContract.activate();

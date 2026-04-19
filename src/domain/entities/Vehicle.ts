@@ -21,7 +21,8 @@ export abstract class Vehicle {
         year: number,
         licensePlate: string,
         dailyRate: number,
-        location: string = 'HQ'
+        location: string = 'HQ',
+        initialMileage: number = 0
     ) {
         this.vehicleId = uuidv4();
         this.make = make;
@@ -30,7 +31,7 @@ export abstract class Vehicle {
         this.licensePlate = licensePlate;
         this.dailyRate = dailyRate;
         this.location = location;
-        this.mileageKm = 0;
+        this.mileageKm = initialMileage;
         this.state = new AvailableState(); // Default state
     }
 

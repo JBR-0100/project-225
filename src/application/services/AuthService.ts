@@ -32,7 +32,7 @@ export class AuthService {
         return customer;
     }
 
-    async login(email: string, password: string): Promise<string> {
+    async login(email: string, password: string): Promise<{ token: string; user: { email: string; role: string; customerId: string } }> {
         const customer = await this.customerRepo.findByEmail(email);
         if (!customer) {
             throw new Error('Invalid credentials');
@@ -43,16 +43,18 @@ export class AuthService {
             throw new Error('Invalid credentials');
         }
 
+        const user = {
+            email: customer.getEmail(),
+            role: customer.getRole(),
+            customerId: customer.getCustomerId(),
+        };
+
         const token = jwt.sign(
-            {
-                customerId: customer.getCustomerId(),
-                role: customer.getRole(),
-                email: customer.getEmail()
-            },
+            user,
             this.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
-        return token;
+        return { token, user };
     }
 }
