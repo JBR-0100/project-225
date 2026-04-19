@@ -8,8 +8,8 @@ bootstrapBackgroundServices();
 const PORT = process.env.PORT || 3000;
 const prisma = new PrismaClient();
 
-const server = app.listen(PORT, () => {
-    Logger.info(`Server is running on port ${PORT}`);
+const server = app.listen(Number(PORT), '0.0.0.0', () => {
+    Logger.info(`Server is running on port ${PORT} at 0.0.0.0`);
 });
 
 process.on('SIGTERM', gracefulShutdown);
